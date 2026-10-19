@@ -1,123 +1,47 @@
-# PawPal+ (Module 2 Project)
+# PawPal+
 
-You are building **PawPal+**, a Streamlit app that helps a pet owner plan care tasks for their pet.
+PawPal+ is a Streamlit-based pet care scheduling application built around four core classes: `Owner`, `Pet`, `Task`, and `Scheduler`. The project supports task creation, recurrence, conflict detection, and daily schedule generation, and I used it to tighten backend validation, state handling, and local persistence so the scheduler behaves predictably under bad or edge-case input.
 
-## Scenario
+## What I changed
 
-A busy pet owner needs help staying consistent with pet care. They want an assistant that can:
+- implemented backend validation for names, times, species, priorities, frequencies, and durations
+- added cleaner trust boundaries between the UI and the model layer
+- hardened local JSON persistence with atomic writes and corrupted-file handling
+- bounded resource usage with caps on pets, tasks, and field lengths
+- added tests for scheduling behavior, recurrence, validation reuse, and persistence
 
-- Track pet care tasks (walks, feeding, meds, enrichment, grooming, etc.)
-- Consider constraints (time available, priority, owner preferences)
-- Produce a daily plan and explain why it chose that plan
+## Security focus
 
-Your job is to design the system first (UML), then implement the logic in Python, then connect it to the Streamlit UI.
+The main hardening work in this project focused on:
 
-## What you will build
+- preventing malformed input from reaching scheduling logic
+- preventing UI-driven updates from bypassing backend validation
+- avoiding unbounded in-memory growth
+- handling corrupted persisted data safely
 
-Your final app should:
+## Repo contents
 
-- Let a user enter basic owner + pet info
-- Let a user add/edit tasks (duration + priority at minimum)
-- Generate a daily schedule/plan based on constraints and priorities
-- Display the plan clearly (and ideally explain the reasoning)
-- Include tests for the most important scheduling behaviors
+- `app.py` - Streamlit interface
+- `pawpal_system.py` - backend model and scheduling logic
+- `tests/test_pawpal.py` - automated tests
+- `SECURITY_README.md` - detailed security hardening writeup
+- case study document - summary of the hardening work
 
-## Getting started
-
-### Setup
+## Running the project
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
+python -m streamlit run app.py
 ```
 
-### Suggested workflow
-
-1. Read the scenario carefully and identify requirements and edge cases.
-2. Draft a UML diagram (classes, attributes, methods, relationships).
-3. Convert UML into Python class stubs (no logic yet).
-4. Implement scheduling logic in small increments.
-5. Add tests to verify key behaviors.
-6. Connect your logic to the Streamlit UI in `app.py`.
-7. Refine UML so it matches what you actually built.
-
-## Smarter Scheduling
-
-- `Scheduler.sort_by_time()` orders tasks by date and time.
-- `Scheduler.filter_tasks()` supports filtering by completion state and pet name.
-- `Scheduler.detect_conflicts()` returns warnings for tasks that share the same date/time.
-- `Task.mark_complete()` creates the next task instance for daily and weekly tasks.
-
-## Testing PawPal+
-
-Run tests with:
+## Running the tests
 
 ```bash
-python -m pytest
+python -m pytest -q
 ```
 
-Current tests cover:
+## Notes
 
-- Task completion updates status and recurrence behavior.
-- Adding a task increases a pet's task count.
-- Tasks are sorted chronologically.
-- Duplicate times are flagged as conflicts.
-
-## Confidence Level
-
-4/5
-
-## Features
-
-- Sorting by time
-- Conflict warnings
-- Daily/weekly recurrence
-- Filtering by completion status or pet name
-
-## Updated UML
-
-```mermaid
-classDiagram
-	class Owner {
-		+name: str
-		+pets: List~Pet~
-		+add_pet(pet)
-		+get_pet_by_name(pet_name)
-		+get_all_tasks()
-	}
-
-	class Pet {
-		+name: str
-		+species: str
-		+tasks: List~Task~
-		+add_task(task)
-	}
-
-	class Task {
-		+description: str
-		+time: str
-		+frequency: str
-		+completed: bool
-		+pet_name: str
-		+due_date: date
-		+mark_complete()
-	}
-
-	class Scheduler {
-		+owner: Owner
-		+get_all_tasks()
-		+print_schedule()
-		+sort_by_time()
-		+filter_tasks(completed, pet_name)
-		+detect_conflicts()
-	}
-
-	Owner "1" --> "many" Pet
-	Pet "1" --> "many" Task
-	Scheduler "1" --> "1" Owner
-```
-
-## Demo
-
-Add your final Streamlit screenshot here after manual browser verification.
+This project started as a scheduling app, but I used it to apply more disciplined backend validation, safer persistence behavior, and clearer model-layer trust boundaries than the starter version had.
