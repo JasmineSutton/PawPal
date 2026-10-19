@@ -3,3 +3,8 @@ __pycache__/
 .venv_new/
 .pytest_cache/
 .DS_Store
+odt_extracted.txt
+__pycache__/pawpal_system.cpython-314.pyc
+Paw_Initial_Instructions.odt
+Paw_TF_Instructions.odt
+__pycache__/pawpal_system.cpython-314.pyc
